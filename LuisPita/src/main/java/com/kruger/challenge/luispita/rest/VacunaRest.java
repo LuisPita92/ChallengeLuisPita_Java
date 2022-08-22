@@ -18,64 +18,62 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-import com.kruger.challenge.luispita.model.Empleado;
-import com.kruger.challenge.luispita.service.EmpleadoService;
+import com.kruger.challenge.luispita.model.Vacuna;
+import com.kruger.challenge.luispita.service.VacunaService;
 
 @RestController
-@RequestMapping("/api/empleado")
-public class EmpleadoRest {
+@RequestMapping("/api/vacuna")
+public class VacunaRest {
 
 	@Autowired
-	EmpleadoService empleadoService;
+	VacunaService vacunaService;
 	
 	@GetMapping(path = "listAll")
-	public ResponseEntity<List<Empleado>> list(){
-		return ResponseEntity.ok(empleadoService.getAllEmpleado());
+	public ResponseEntity<List<Vacuna>> list(){
+		return ResponseEntity.ok(vacunaService.getAllVacunas());
 	}
 	
 	@GetMapping(path = "listById")
-	public ResponseEntity<Optional<Empleado>> listById(@PathVariable Long id){
-		return ResponseEntity.ok(empleadoService.getEmpleadoById(id));
+	public ResponseEntity<Optional<Vacuna>> listById(@PathVariable Long id){
+		return ResponseEntity.ok(vacunaService.getVacunaById(id));
 	}
 	
 	@PostMapping("create")
-	public ResponseEntity<Empleado> create(@RequestBody Empleado empleado){
-		Empleado temporal = empleadoService.create(empleado);
+	public ResponseEntity<Vacuna> create(@RequestBody Vacuna vacuna){
+		Vacuna temporal = vacunaService.create(vacuna);
 		try {
-			return ResponseEntity.created(new URI("api/empleado"+temporal.getId())).body(temporal);
+			return ResponseEntity.created(new URI("api/vacuna"+temporal.getId())).body(temporal);
 		}catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
 	
 	@PutMapping("update")
-	public ResponseEntity<?> update(@RequestBody Empleado empleado){
+	public ResponseEntity<?> update(@RequestBody Vacuna vacuna){
 		Map<String, Object> response = new HashMap<>();
-		Optional<Empleado> temporal = empleadoService.getEmpleadoById(empleado.getId());
-		Empleado nuevoEmpleado = new Empleado();
+		Optional<Vacuna> temporal = vacunaService.getVacunaById(vacuna.getId());
+		Vacuna nuevaVacuna = new Vacuna();
 		try {
 			if (temporal == null) {
-				response.put("mensaje", "No existe el empleado");
+				response.put("mensaje", "No existe la vacuna.");
 				return new ResponseEntity<Map<String, Object>>(response,HttpStatus.NOT_FOUND);
 			}
-			nuevoEmpleado = temporal.get();
-			nuevoEmpleado.setCedula(empleado.getCedula());
-			nuevoEmpleado.setNombre(empleado.getNombre());
-			nuevoEmpleado.setApellido(empleado.getApellido());
-			nuevoEmpleado.setCorreo(empleado.getCorreo());
+			nuevaVacuna = temporal.get();
+			nuevaVacuna.setNombre(vacuna.getNombre());
+			nuevaVacuna.setEstado(vacuna.getEstado());
 						
-			return ResponseEntity.created(new URI("api/empleado/update")).body(temporal);
+			return ResponseEntity.created(new URI("api/vacuna/update")).body(temporal);
 		}catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
 
 	@DeleteMapping("delete")
-	public ResponseEntity<?> delete(@RequestBody Empleado empleado){
+	public ResponseEntity<?> delete(@RequestBody Vacuna vacuna){
 		Map<String, Object> response = new HashMap<>();
 		try {
-			empleadoService.delete(empleado.getId());
-			response.put("mensaje", "Empleado eliminado con éxito.");
+			vacunaService.delete(vacuna.getId());
+			response.put("mensaje", "Vacuna eliminada con éxito.");
 			return new ResponseEntity<Map<String, Object>>(response,HttpStatus.OK);
 		}catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
